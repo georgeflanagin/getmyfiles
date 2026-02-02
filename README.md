@@ -10,7 +10,7 @@ There are a couple of assumptions that users must keep in mind.
 - Runs entirely as the invoking user; normal filesystem permissions apply (no privilege escalation), no sudo-ing.
 - It does not copy the files, it moves them from the place where they are now to the directory you specify, and removes the files from wherever they are now.
 - As a user, you must have ssh-key authentication to avoid constantly being asked for your password.
-- While you *could* move files within the same local file system, that's a pointless activity.
+- While you *could* move files within the same local file system, that's a pointless activity. `mv` and `cp` work well enough.
 - The common Linux tools -- `rsync`, `tar`, `gzip`, *etc* -- must be present in your environment. They almost always are.
 - This tool ignores in the information in `$HOME/.ssh/config` to ensure consistent behavior. We have no way of knowing what is in your ssh config file, and you might have defined `node42` to mean something else.
 
