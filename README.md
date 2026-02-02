@@ -28,13 +28,14 @@ getmyfiles [opts]
 - `--dry-run` : Just show what files would have been affected rather than moving any files.
 - `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does. This option can be repeated to get multiple groups of files in one sweep.
 - `--host` : the value can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program.
-- `--job` : only works in SLURM environments. This uses the value to look up the node where the job ran.
+- `--job` : only works in SLURM environments. The value is used to look up the node where the job ran.
 - `--just-do-it` : accept all defaults stored in `$HOME/.local/getmyfiles.config`
-- `--unpack` : If present, the directory structure from the remote location is "cloned" into the destination. If not, the directory will contain a gzipped tarball whose fate you can decide. The reason for this option is that it is a lot easier to download one tarball to your PC than it is to download a directory full of files.
+- `--unpack` : If present, the directory structure from the remote location is "cloned" into the destination. If not, the directory will contain a gzipped tarball whose fate you can decide. The reason for this option is that it is a lot easier to move or copy one tarball to somewhere else than it is to deal with a directory full of files.
 
-## Things to keep in mind
+## Things to keep in mind about the options
 
 - Each operation will create a directory under `--dest` that is date stamped. This prevents collisions and makes it easier to find "those files from last Friday."
+- If you used the `--job` parameter, the job ID will appear as a suffix to the date in the destination file. Job IDs are guaranteed unique, and this makes it easier to find "those files from job 1729."
 - Files are only removed *after* the transfer has been successful. If something goes wrong with the transfer, you can rerun it and pick up where you left off.
 
 ## Explanatory examples
