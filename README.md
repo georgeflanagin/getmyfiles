@@ -24,21 +24,26 @@ getmyfiles [opts]
 
 ## Options
 
+- `--dest` : If the destination directory is just a bare name like "logs", it is assumed to be under `$HOME`. For example if you specify `logs`, you mean `$HOME/logs`. If the directory does not exist, it will be created. You can name any directory you like, and you will need write access to it.
+- `--dry-run` : Just show what files would have been affected rather than moving any files.
+- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does.
 - `--host` : the value can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program.
 - `--job` : only works in SLURM environments. This uses the value to look up the node where the job ran.
-- `--dest` : If the destination directory is just a bare name like "logs", it is assumed to be under `$HOME`. For example if you specify `logs`, you mean `$HOME/logs`. If the directory does not exist, it will be created. You can name any directory you like, and you will need write access to it.
+- `--just-do-it` : accept all defaults stored in `$HOME/.local/getmyfiles.config`
 - `--unpack` : If present, the directory structure from the remote location is "cloned" into the destination. If not, the directory will contain a gzipped tarball whose fate you can decide. The reason for this option is that it is a lot easier to download one tarball to your PC than it is to download a directory full of files.
-- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does.
-- `--dry-run` : just show what would happen rather than doing it.
 
-Here is the meaning and format of the parameters.
+## Things to keep in mind
 
+- Each operation will create a directory under `--dest` that is date stamped. This prevents collisions and makes it easier to find "those files from last Friday."
+- Files are only removed *after* the transfer has been successful. If something goes wrong with the transfer, you can rerun it and pick up where you left off.
 
+## Explanatory examples
 
-## Explanatory example
+[1] Get my `log` files from node42, and put them in `$HOME/logfiles`
 
-Let's say you want to get all your log files from node42. Let's find out what will happen before we do this for real.
+```bash
+getmyfiles --host node42 --dest logfiles --files "*.log" --unpack
+```
 
-getmyfiles --host node42 --dest logfiles --files "*.log" --dry-run
-
+The result will be a directory named `$HOME/logfiles/2026-02-02-0` that contains `x.log`, `y.log`, and so on. The `-0` suffix allows for multiple collections of similar files on the same day. 
 
