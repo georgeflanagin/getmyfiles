@@ -26,7 +26,7 @@ getmyfiles [opts]
 
 - `--dest` : If the destination directory is just a bare name like "logs", it is assumed to be under `$HOME`. For example if you specify `logs`, you mean `$HOME/logs`. If the directory does not exist, it will be created. You can name any directory you like, and you will need write access to it.
 - `--dry-run` : Just show what files would have been affected rather than moving any files.
-- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does.
+- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does. This option can be repeated to get multiple groups of files in one sweep.
 - `--host` : the value can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program.
 - `--job` : only works in SLURM environments. This uses the value to look up the node where the job ran.
 - `--just-do-it` : accept all defaults stored in `$HOME/.local/getmyfiles.config`
@@ -47,3 +47,10 @@ getmyfiles --host node42 --dest logfiles --files "*.log" --unpack
 
 The result will be a directory named `$HOME/logfiles/2026-02-02-0` that contains `x.log`, `y.log`, and so on. The `-0` suffix allows for multiple collections of similar files on the same day. 
 
+[2] Get my checkpoint files and my log files from job 1729, put them a directory named junk, and just leave it as a tarball.
+
+```bash
+getmyfiles --job 1729 --dest junk --files "*.log" --files "*.chk"
+```
+
+The result will be a directory named `$HOME/junk/2026-02-02-1729` that contains a file named `files.tgz`. Note that the job id is used as the serialization for the name.
