@@ -14,7 +14,7 @@ There are a couple of assumptions that users must keep in mind.
 - The common Linux tools -- `rsync`, `tar`, `gzip`, *etc* -- must be present in your environment. They almost always are.
 - This tool ignores in the information in `$HOME/.ssh/config` to ensure consistent behavior. We have no way of knowing what is in your ssh config file, and you might have defined `node42` to mean something else.
 
-## command line use
+## Command line use
 
 The general syntax is the customary Linux tool standard. The options can be present in any order.
 
@@ -37,6 +37,7 @@ getmyfiles [opts]
 - Each operation will create a directory under `--dest` that is date stamped. This prevents collisions and makes it easier to find "those files from last Friday."
 - If you used the `--job` parameter, the job ID will appear as a suffix to the date in the destination file. Job IDs are guaranteed unique, and this makes it easier to find "those files from job 1729."
 - Files are only removed *after* the transfer has been successful. If something goes wrong with the transfer, you can rerun it and pick up where you left off.
+- If you provide neither `--job` or `--host`, this program will assume you are in a SLURM environment, and you are looking for the most recently run job of yours, and it will do its best to go find it.
 
 ## Explanatory examples
 
