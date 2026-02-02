@@ -24,6 +24,6 @@ getmyfiles --host remotelocation --dest directory --unpack
 
 Here is the meaning and format of the parameters.
 
-- `--host remotelocation` "remotelocation" can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program.
-- `--dest directory`
-- `--unpack` 
+- `--host remotelocation` : `remotelocation` can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program.
+- `--dest directory` : If `directory` is just a bare name like "logs", it is assumed to be in `$HOME`. You can name any directory you like, and you will need write access to it.
+- `--unpack` : If present, the directory structure from the remote location is "cloned" into the destination. If not, the directory will contain a gzipped tarball whose fate you can decide.
