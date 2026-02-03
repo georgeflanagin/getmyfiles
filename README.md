@@ -71,4 +71,10 @@ The result will be a directory named `$HOME/junk/2026-02-02-1729` that contains 
 
 This repo includes `catnap.slurm`, an almost trivial SLURM job that creates a handful of junk files, and sleeps for two minutes.
 It will create a file named `catnap.$JOB_ID.out` in your submit directory. It will run on a partition named `cpunodes`, and at the moment
-all UR clusters have a partition of that name.
+all UR clusters have a partition of that name. You can run the job with the usual command:
+
+```bash
+sbatch catnap.slurm
+```
+
+The job ID will be printed to your screen. You can use the job ID or the information in the `catnap...out` file to locate the files you want to retrieve and scrub from the compute node.
