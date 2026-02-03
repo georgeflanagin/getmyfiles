@@ -5,9 +5,9 @@ This tool allows the user to retrieve files and move them to the user's home
 directory. While it will work in any environment that uses IP addressing, the 
 intent is to use it primarily with clusters.
 
-There are a couple of assumptions that users must keep in mind.
+There are a couple of assumptions and constraints that users must keep in mind.
 
-- Runs entirely as the invoking user; normal filesystem permissions apply (no privilege escalation), no sudo-ing.
+- This script runs entirely as the invoking user; normal filesystem permissions apply (no privilege escalation), no sudo-ing.
 - It does not copy the files, it moves them from the place where they are now to the directory you specify, and removes the files from wherever they are now.
 - As a user, you must have ssh-key authentication to avoid constantly being asked for your password.
 - While you *could* move files within the same local file system, that's a pointless activity. `mv` and `cp` work well enough.
@@ -26,9 +26,9 @@ getmyfiles [opts]
 
 - `--dest` : If the destination directory is just a bare name like "logs", it is assumed to be under `$HOME`. For example if you specify `logs`, you mean `$HOME/logs`. If the directory does not exist, it will be created. You can name any directory you like, and you will need write access to it.
 - `--dry-run` : Just show what files would have been affected rather than moving any files.
-- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does. This option can be repeated to get multiple groups of files in one sweep.
+- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location, think of it as `$REMOTE_HOME`. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does. This option can be repeated to get multiple groups of files in one sweep. If the argument to `--files` contains a directory, the directories that match will be traversed recursively.
 - `--host` : the value can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program. You can, of course, specify another user by naming the user in the argument like this: `otherperson@somehost`
-- `--job` : only works in SLURM environments. The value is used to look up the node where the job ran. Just the number.
+- `--job` : only works in SLURM environments. The value is used to look up the node where the job ran. Just the number. If both `--job` and `--host` are present (a mistake in logic), `--job` wins.
 - `--just-do-it` : The purpose is to support scripts and automation, and future uses and enhancement to the features of this script. **This option supersedes `--dry-run` if both options are present!**
 - `--unpack` : If present, the directory structure from the remote location is "cloned" into the destination. If not, the directory will contain a gzipped tarball whose fate you can decide. The reason for this option is that it is a lot easier to move or copy one tarball to somewhere else than it is to deal with a directory full of files.
 
@@ -37,7 +37,8 @@ getmyfiles [opts]
 - Each operation will create a directory under `--dest` that is date stamped. This prevents collisions and makes it easier to find "those files from last Friday."
 - If you used the `--job` parameter, the job ID will appear as a suffix to the date in the destination file. Job IDs are guaranteed unique, and this makes it easier to find "those files from job 1729."
 - Files are only removed *after* the transfer has been successful. If something goes wrong with the transfer, you can rerun it and pick up where you left off.
-- If you provide neither `--job` or `--host`, this program will assume you are in a SLURM environment, and you are looking for the most recently run job of yours, and it will do its best to go find it.
+- If you provide neither `--job` or `--host`, this program will assume you are in a SLURM environment, and you are looking for the most recently run job of yours, and it will do its best to go find it. "Most recently run" means the most recent job that has an end time known to SLURM.
+- If a SLURM job ran on multiple nodes, only the "first" node is assumed to be the target, unless you have used the `--just-do-it` parameter.
 
 ## Explanatory examples
 
