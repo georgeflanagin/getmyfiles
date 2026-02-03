@@ -10,7 +10,8 @@ slurm_job_nodes_expanded()
     scontrol show hostnames "$nodelist"
 }
 
-gmf_ssh_base_opts() {
+gmf_ssh_base_opts()
+{
     # -F /dev/null ignores ~/.ssh/config
     # BatchMode=yes prevents password prompts (fails fast if no key auth)
     # StrictHostKeyChecking=accept-new is friendlier than "no" but still safe-ish.
@@ -21,13 +22,15 @@ gmf_ssh_base_opts() {
                   "-o" "ConnectTimeout=8"
 }
 
-gmf_slurm_base_jobid() {
+gmf_slurm_base_jobid()
+{
     local jobid="$1"
     [[ -z "$jobid" ]] && return 2
     printf '%s\n' "${jobid%%.*}"
 }
 
-gmf_slurm_job_nodes() {
+gmf_slurm_job_nodes()
+{
     local jobid; jobid="$(gmf_slurm_base_jobid "$1")" || return 2
 
     # Get compressed NodeList=... then expand to hostnames
@@ -41,7 +44,8 @@ gmf_slurm_job_nodes() {
     scontrol show hostnames "$nodelist"
 }
 
-gmf_slurm_my_most_recent_job() {
+gmf_slurm_my_most_recent_job()
+{
     # Prefer jobs that actually ended (completed/failed/etc.), not job steps.
     sacct -u "$USER" --starttime now-7days \
         --format=JobIDRaw,End,State --noheader \
@@ -53,7 +57,8 @@ gmf_slurm_my_most_recent_job() {
         | awk '{print $1}'
 }
 
-gmf_resolve_hosts() {
+gmf_resolve_hosts()
+{
     local host_arg="$1" job_arg="$2"
 
     if [[ -n "$host_arg" ]]; then
@@ -73,7 +78,8 @@ gmf_resolve_hosts() {
     gmf_slurm_job_nodes "$job_arg"
 }
 
-gmf_make_dest_dir() {
+gmf_make_dest_dir()
+{
     local dest="$1" jobid="$2"
 
     [[ -z "$dest" ]] && return 2
@@ -97,7 +103,8 @@ gmf_make_dest_dir() {
     done
 }
 
-gmf_host_is_clusterish() {
+gmf_host_is_clusterish()
+{
     local h="$1"
     # Accept IPv4 RFC1918-ish and nodeNN style hostnames
     [[ "$h" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] && return 0
@@ -106,12 +113,14 @@ gmf_host_is_clusterish() {
 }
 
 
-gmf_remote_home() {
+gmf_remote_home()
+{
     local host="$1"
     ssh "$(gmf_ssh_base_opts)" "$host" 'printf "%s\n" "$HOME"' 2>/dev/null
 }
 
-gmf_remote_glob_list0() {
+gmf_remote_glob_list0()
+{
     local host="$1" remote_home="$2" filespec="$3"
     [[ -z "$host" || -z "$remote_home" || -z "$filespec" ]] && return 2
 
@@ -133,7 +142,8 @@ gmf_remote_glob_list0() {
     ' -- "$remote_home" "$filespec"
 }
 
-gmf_tar_stream_unpack() {
+gmf_tar_stream_unpack()
+{
     local host="$1" remote_home="$2" destdir="$3"
     shift 3
     local paths=("$@")
@@ -148,7 +158,8 @@ gmf_tar_stream_unpack() {
     | tar -xzf - -C "$destdir"
 }
 
-gmf_remote_remove() {
+gmf_remote_remove()
+{
     local host="$1" remote_home="$2"
     shift 2
     local paths=("$@")
@@ -161,7 +172,8 @@ gmf_remote_remove() {
     ' -- "$remote_home" "${paths[@]}"
 }
 
-gmf_require_single_host_unless_justdoit() {
+gmf_require_single_host_unless_justdoit()
+{
     local justdoit="$1"; shift
     local hosts=("$@")
 
@@ -180,27 +192,31 @@ gmf_require_single_host_unless_justdoit() {
     return 0
 }
 
-gmf_host_subdir() {
+gmf_host_subdir()
+{
     local dest_run="$1" host="$2"
     [[ -z "$dest_run" || -z "$host" ]] && return 2
     mkdir -p "$dest_run/$host" || return 3
     printf '%s\n' "$dest_run/$host"
 }
 
-gmf_add_filespec() {
+gmf_add_filespec()
+{
     local -n _arr_ref="$1"
     local spec="$2"
     [[ -z "$spec" ]] && return 2
     _arr_ref+=("$spec")
 }
 
-gmf_print_plan() {
+gmf_print_plan()
+{
     local mode="$1" host="$2" dest="$3" remote_home="$4" spec="$5"
     printf '[%s] host=%s  remote=%s/%s  ->  %s\n' \
         "$mode" "$host" "$remote_home" "$spec" "$dest"
 }
 
-make_junk_files() {
+make_junk_files()
+{
     # Create N files of size SIZE bytes with random ASCII content.
     #
     # Usage:
@@ -242,7 +258,8 @@ make_junk_files() {
     done
 }
 
-make_junk_files_safe() {
+make_junk_files_safe()
+{
     local prefix="$1"
     local count="$2"
     local size="$3"
