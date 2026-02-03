@@ -26,7 +26,7 @@ getmyfiles [opts]
 
 - `--dest` : If the destination directory is just a bare name like "logs", it is assumed to be under `$HOME`. For example if you specify `logs`, you mean `$HOME/logs`. If the directory does not exist, it will be created. You can name any directory you like, and you will need write access to it.
 - `--dry-run` : Just show what files would have been affected rather than moving any files.
-- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location, think of it as `$REMOTE_HOME`. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does. This option can be repeated to get multiple groups of files in one sweep. If the argument to `--files` contains a directory, the directories that match will be traversed recursively.
+- `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location, think of it as `$REMOTE_HOME`. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does. This option can be repeated to get multiple groups of files in one sweep. At least one `--files` is required. If the argument to `--files` contains a directory, the directories that match will be traversed recursively. 
 - `--host` : the value can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program. You can, of course, specify another user by naming the user in the argument like this: `otherperson@somehost`
 - `--job` : only works in SLURM environments. The value is used to look up the node where the job ran. If both `--job` and `--host` are present (a mistake in logic), `--job` wins. Only the number is needed, but the script will accept 1729.batch, 1729.0, or anything else that refers to the same job.
 - `--just-do-it` : The purpose is to support scripts and automation, and future uses and enhancement to the features of this script. **This option supersedes `--dry-run` if both options are present!**
@@ -39,6 +39,7 @@ getmyfiles [opts]
 - Files are only removed *after* the transfer has been successful. If something goes wrong with the transfer, you can rerun it and pick up where you left off.
 - If you provide neither `--job` or `--host`, this program will assume you are in a SLURM environment, and you are looking for the most recently run job of yours, and it will do its best to go find it. "Most recently run" means the most recent job that has an end time known to SLURM.
 - If a SLURM job ran on multiple nodes, only the "first" node is assumed to be the target, unless you have used the `--just-do-it` parameter.
+- The `--files` should handle files with embedded spaces in the names correctly, but it is not *reasonable* to test for every combo of characters that are not printable ASCII characters. A much better idea is to 
 
 ## Explanatory examples
 
