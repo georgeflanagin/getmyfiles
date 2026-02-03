@@ -29,7 +29,7 @@ getmyfiles [opts]
 - `--files` : This filespec is applied to the files in the remote location, and if it does not match anything (because of a typo, there is nothing there, etc.) you do not retrieve files. Like the destination, this spec is applied starting at $HOME in the remote location. The filespec must be quoted if it contains a "*", "?", or anything else that might be a wildcard, and it usually does. This option can be repeated to get multiple groups of files in one sweep.
 - `--host` : the value can be an IP address or a hostname, with the assumption that the remote user name is the same as the user currently running the program. You can, of course, specify another user by naming the user in the argument like this: `otherperson@somehost`
 - `--job` : only works in SLURM environments. The value is used to look up the node where the job ran. Just the number.
-- `--just-do-it` : The purpose is to support scripts and automation. This option supersedes `--dry-run`. 
+- `--just-do-it` : The purpose is to support scripts and automation, and future uses and enhancement to the features of this script. **This option supersedes `--dry-run` if both options are present!**
 - `--unpack` : If present, the directory structure from the remote location is "cloned" into the destination. If not, the directory will contain a gzipped tarball whose fate you can decide. The reason for this option is that it is a lot easier to move or copy one tarball to somewhere else than it is to deal with a directory full of files.
 
 ## Things to keep in mind about the options
