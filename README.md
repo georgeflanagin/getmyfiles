@@ -16,6 +16,14 @@ There are a couple of assumptions and constraints that users must keep in mind.
 
 ## Command line use
 
+First, you need to source the file `getmyfiles.sh` to bring the functions into your environment.
+
+```bash
+source getmyfiles.sh
+```
+
+Note that it is unnecessary for the file to be marked as executable because the `source` command 
+reads the file and treats it exactly as if you had typed it in interactively.
 The general syntax is the customary Linux tool standard. The options can be present in any order.
 
 ```bash
@@ -58,3 +66,9 @@ getmyfiles --job 1729 --dest junk --files "*.log" --files "*.chk"
 ```
 
 The result will be a directory named `$HOME/junk/2026-02-02-1729` that contains a file named `files.tgz`. Note that the job id is used as the serialization for the name.
+
+## Take it for a test drive.
+
+This repo includes `catnap.slurm`, an almost trivial SLURM job that creates a handful of junk files, and sleeps for two minutes.
+It will create a file named `catnap.$JOB_ID.out` in your submit directory. It will run on a partition named `cpunodes`, and at the moment
+all UR clusters have a partition of that name.
