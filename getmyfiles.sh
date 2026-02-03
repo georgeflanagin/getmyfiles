@@ -200,4 +200,63 @@ gmf_print_plan() {
         "$mode" "$host" "$remote_home" "$spec" "$dest"
 }
 
+make_junk_files() {
+    # Create N files of size SIZE bytes with random ASCII content.
+    #
+    # Usage:
+    #   make_junk_files PREFIX COUNT SIZE [SUFFIX]
+    #
+    # Examples:
+    #   make_junk_files junk 5 1048576 .chk
+    #   make_junk_files log 10 4096 .log
+    #
+    # Result:
+    #   junk001.chk junk002.chk ... junk005.chk
+
+    local prefix="$1"
+    local count="$2"
+    local size="$3"
+    local suffix="${4:-.chk}"
+
+    if [[ -z "$prefix" || -z "$count" || -z "$size" ]]; then
+        echo "usage: make_junk_files PREFIX COUNT SIZE [SUFFIX]" >&2
+        return 2
+    fi
+
+    if ! [[ "$count" =~ ^[0-9]+$ && "$size" =~ ^[0-9]+$ ]]; then
+        echo "count and size must be integers (bytes)." >&2
+        return 3
+    fi
+
+    local i fname
+    for ((i=1; i<=count; i++)); do
+        printf -v fname "%s%03d%s" "$prefix" "$i" "$suffix"
+
+        # Generate printable ASCII (space through ~)
+        head -c "$size" /dev/urandom \
+            | tr -dc ' -~' \
+            | head -c "$size" \
+            > "$fname"
+
+        printf 'created %s (%d bytes)\n' "$fname" "$size"
+    done
+}
+
+make_junk_files_safe() {
+    local prefix="$1"
+    local count="$2"
+    local size="$3"
+    local suffix="${4:-.chk}"
+
+    local max_total=$((500 * 1024 * 1024))   # 500 MB safety cap
+    local total=$((count * size))
+
+    if (( total > max_total )); then
+        echo "Refusing: would create $total bytes (> $max_total cap)" >&2
+        echo "Edit function if you really mean it." >&2
+        return 9
+    fi
+
+    make_junk_files "$@"
+}
 
