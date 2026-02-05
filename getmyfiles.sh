@@ -16,13 +16,15 @@
 
 # ---- helpers ---------------------------------------------------------------
 
-gmf_die() {
+gmf_die() 
+{
     local rc="${1:-1}"; shift
     echo "getmyfiles: $*" >&2
     return "$rc"
 }
 
-gmf_usage() {
+gmf_usage() 
+{
     cat >&2 <<'USAGE'
 Usage:
   getmyfiles [opts]
@@ -49,7 +51,8 @@ Constraints:
 USAGE
 }
 
-gmf_ssh_base_opts() {
+gmf_ssh_base_opts() 
+{
     # Ignores ~/.ssh/config and avoids password prompts.
     # Adjust StrictHostKeyChecking policy if you prefer different behavior.
     printf '%s\n' \
@@ -59,28 +62,33 @@ gmf_ssh_base_opts() {
         "-o" "ConnectTimeout=8"
 }
 
-gmf_slurm_base_jobid() {
+gmf_slurm_base_jobid() 
+{
+    ###
+    # Strip the output of a slurm command to just a bare number.
+    ###
     local jobid="$1"
     [[ -z "$jobid" ]] && return 2
     printf '%s\n' "${jobid%%.*}"
 }
 
-gmf_slurm_job_nodes() {
+gmf_slurm_job_nodes() 
+{
+    ###
+    # For simplicity, let's assume this all ran on one node.
+    ###
     local jobid; jobid="$(gmf_slurm_base_jobid "$1")" || return 2
 
     local nodelist
-    nodelist=$(
-        scontrol show job "$jobid" 2>/dev/null \
-        | awk -F= '/\bNodeList=/{print $2}' \
-        | awk '{print $1}' \
-        | head -n1
-    )
+    nodelist=$(sacct -j "$jobid" --format=NodeList) | tail -n +3 | head -1
+
     [[ -z "$nodelist" ]] && return 3
 
     scontrol show hostnames "$nodelist"
 }
 
-gmf_slurm_my_most_recent_job() {
+gmf_slurm_my_most_recent_job() 
+{
     # Most recent job with a known End time. (Not steps; base IDs only.)
     sacct -u "$USER" --starttime now-7days \
         --format=JobIDRaw,End,State --noheader 2>/dev/null \
@@ -90,7 +98,8 @@ gmf_slurm_my_most_recent_job() {
     | awk '{print $1}'
 }
 
-gmf_resolve_hosts() {
+gmf_resolve_hosts() 
+{
     # host_arg may be empty; job_arg may be empty.
     local host_arg="$1" job_arg="$2"
 
@@ -115,13 +124,15 @@ gmf_resolve_hosts() {
     gmf_slurm_job_nodes "$job_arg"
 }
 
-gmf_remote_home() {
+gmf_remote_home() 
+{
     # Remote home directory for the provided host (or user@host)
     local host="$1"
     ssh "$(gmf_ssh_base_opts)" "$host" 'printf "%s\n" "$HOME"' 2>/dev/null
 }
 
-gmf_make_dest_dir() {
+gmf_make_dest_dir() 
+{
     # Create dated run directory under dest base, optionally suffixed with -JOBID.
     # Also adds -0, -1, ... to avoid collisions.
     local dest="$1" jobid="$2"
@@ -146,14 +157,16 @@ gmf_make_dest_dir() {
     done
 }
 
-gmf_host_subdir() {
+gmf_host_subdir() 
+{
     local dest_run="$1" host="$2"
     [[ -z "$dest_run" || -z "$host" ]] && return 2
     mkdir -p "$dest_run/$host" || return 3
     printf '%s\n' "$dest_run/$host"
 }
 
-gmf_remote_glob_list0() {
+gmf_remote_glob_list0() 
+{
     # Print NUL-delimited list of matches for filespec relative to remote_home.
     # Safe with spaces/newlines in filenames.
     local host="$1" remote_home="$2" filespec="$3"
@@ -176,7 +189,8 @@ gmf_remote_glob_list0() {
     ' -- "$remote_home" "$filespec"
 }
 
-gmf_tar_stream_to_file() {
+gmf_tar_stream_to_file() 
+{
     # Create local tar.gz file from remote paths (relative to remote_home).
     local host="$1" remote_home="$2" outfile="$3"
     shift 3
@@ -190,7 +204,8 @@ gmf_tar_stream_to_file() {
     ' -- "$remote_home" "${paths[@]}" > "$outfile"
 }
 
-gmf_tar_stream_unpack() {
+gmf_tar_stream_unpack() 
+{
     # Extract remote tar.gz stream into local destdir.
     local host="$1" remote_home="$2" destdir="$3"
     shift 3
@@ -205,7 +220,8 @@ gmf_tar_stream_unpack() {
     | tar -xzf - -C "$destdir"
 }
 
-gmf_remote_remove() {
+gmf_remote_remove() 
+{
     # Remove remote paths (relative to remote_home) after successful transfer.
     local host="$1" remote_home="$2"
     shift 2
@@ -219,7 +235,8 @@ gmf_remote_remove() {
     ' -- "$remote_home" "${paths[@]}"
 }
 
-gmf_first_hostname() {
+gmf_first_hostname() 
+{
     # "First node" defined as first hostname returned by scontrol show hostnames
     local line
     IFS= read -r line || return 1
@@ -230,7 +247,8 @@ gmf_first_hostname() {
 
 # ---- main tool ------------------------------------------------------------
 
-getmyfiles() {
+getmyfiles() 
+{
     local dest="" host="" job="" unpack=0 dryrun=0 justdoit=0
     local -a filespecs=()
 
@@ -318,6 +336,7 @@ getmyfiles() {
             host_run="$base_run"
         fi
 
+        echo "checking for home dir on $h"
         remote_home="$(gmf_remote_home "$h")"
         [[ -z "$remote_home" ]] && return "$(gmf_die 2 "could not determine remote home on $h (ssh failure?)")"
 
