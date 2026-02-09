@@ -16,8 +16,9 @@
 # - This moves files (rsync --remove-source-files). It does not copy.
 # -----------------------------------------------------------------------------
 
-gmf_ssh_base_opts() {
-    echo ">>>>> ${FUNCNAME[0]}" "$@"
+gmf_ssh_base_opts() 
+{
+    # echo ">>>>> ${FUNCNAME[0]}" "$@"
     printf '%s\n' \
         "-F" "/dev/null" \
         "-o" "BatchMode=yes" \
@@ -25,8 +26,9 @@ gmf_ssh_base_opts() {
         "-o" "ConnectTimeout=8"
 }
 
-gmf_make_run_dir() {
-    echo ">>>>> ${FUNCNAME[0]}" "$@"
+gmf_make_run_dir() 
+{
+    # echo ">>>>> ${FUNCNAME[0]}" "$@"
     # $HOME/<localdir>/YYYY-MM-DD-<job>-<counter>
     local localdir="$1" jobid="$2"
     [[ -z "$localdir" || -z "$jobid" ]] && return 2
@@ -48,8 +50,9 @@ gmf_make_run_dir() {
     done
 }
 
-getmyfiles() {
-    echo ">>>>> ${FUNCNAME[0]}" "$@"
+getmyfiles() 
+{
+    # echo ">>>>> ${FUNCNAME[0]}" "$@"
     local job="" localdir="" remotedir="" filespec="" dryrun=0
 
     while [[ $# -gt 0 ]]; do
