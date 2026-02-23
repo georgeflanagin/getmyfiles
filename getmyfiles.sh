@@ -1,3 +1,4 @@
+
 # -----------------------------------------------------------------------------
 # getmyfiles (simplified)
 #
@@ -52,6 +53,8 @@ gmf_make_run_dir()
 
 getmyfiles() 
 {
+    export OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH=
     # echo ">>>>> ${FUNCNAME[0]}" "$@"
     local job="" localdir="" remotedir="" filespec="" dryrun=0
 
@@ -85,8 +88,8 @@ USAGE
 
     # Required args
     [[ -z "$job" ]]       && { echo "getmyfiles: missing --job" >&2; return 2; }
-    [[ -z "$localdir" ]]  && { echo "getmyfiles: missing --local-dir" >&2; return 2; }
     [[ -z "$remotedir" ]] && { echo "getmyfiles: missing --remote-dir" >&2; return 2; }
+    [[ -z "$localdir" ]]  && { echo "getmyfiles: missing --local-dir" >&2; return 2; }
     [[ -z "$filespec" ]]  && { echo "getmyfiles: missing --files" >&2; return 2; }
 
     # remote-dir should be absolute (per your example/spec intent)
@@ -95,19 +98,15 @@ USAGE
         return 2
     fi
 
-
-    
-
-
     local node
-    node=$(sacct -j 480599 --format=NodeList --noheader | head -1 | awk '{print $1}')
+    node=$(sacct -j "$job" --format=NodeList --noheader | head -1 | awk '{print $1}')
     if [ -z "$node" ]; then
         echo "getmyfiles: could not resolve node for job $basejob" >&2
         return 3
     fi
 
     local rundir
-    rundir="$(gmf_make_run_dir "$localdir" "job")" || {
+    rundir="$(gmf_make_run_dir "$localdir" "$job")" || {
         echo "getmyfiles: could not create local destination directory" >&2
         return 4
     }
@@ -145,6 +144,6 @@ USAGE
     fi
 
     echo "getmyfiles: done. saved in $rundir"
+    export LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
     return 0
 }
-
